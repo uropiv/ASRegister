@@ -12,14 +12,14 @@
     #btnInicio{background:#28a745} /* Verde */
     #btnFin{background:#dc3545}   /* Rojo */
     button:disabled{opacity:0.6;cursor:not-allowed}
-    #status{margin-top:1rem;font-weight:bold}
+    #status{margin-top:1rem;font-weight:bold;transition: all 0.5s ease;}
   </style>
 </head>
 <body>
   <h1>Control de Asistencia</h1>
   <p>Complete sus datos personales antes de marcar asistencia.</p>
 
-  <!-- 🔹 Datos del usuario -->
+  <!-- Datos del usuario -->
   <label for="legajo">Legajo Personal</label>
   <input id="legajo" type="text" placeholder="Ej: 12345">
 
@@ -32,7 +32,7 @@
   <label for="dni">Documento Nacional de Identidad (DNI)</label>
   <input id="dni" type="text" placeholder="Ej: 12345678">
 
-  <!-- 🔹 Botones -->
+  <!-- Botones -->
   <button id="btnInicio">Iniciar servicio</button>
   <button id="btnFin">Finalizar servicio</button>
   <p id="status"></p>
@@ -45,10 +45,9 @@
 
     // 🔹 Cargar datos guardados al abrir la página
     window.onload = () => {
-      if (localStorage.getItem("legajo")) document.getElementById("legajo").value = localStorage.getItem("legajo");
-      if (localStorage.getItem("jerarquia")) document.getElementById("jerarquia").value = localStorage.getItem("jerarquia");
-      if (localStorage.getItem("apellidoNombre")) document.getElementById("apellidoNombre").value = localStorage.getItem("apellidoNombre");
-      if (localStorage.getItem("dni")) document.getElementById("dni").value = localStorage.getItem("dni");
+      ["legajo","jerarquia","apellidoNombre","dni"].forEach(id => {
+        if (localStorage.getItem(id)) document.getElementById(id).value = localStorage.getItem(id);
+      });
     };
 
     // 🔹 Guardar datos en el navegador
@@ -57,6 +56,20 @@
       localStorage.setItem("jerarquia", jerarquia);
       localStorage.setItem("apellidoNombre", apellidoNombre);
       localStorage.setItem("dni", dni);
+    }
+
+    // 🔹 Función para mostrar mensajes con color, emoji y desaparecimiento
+    function mostrarStatus(mensaje, tipo) {
+      status.textContent = mensaje;
+      switch(tipo) {
+        case 'okInicio': status.style.color = 'green'; break;
+        case 'okFin': status.style.color = 'red'; break;
+        case 'warning': status.style.color = 'orange'; break;
+        case 'error': status.style.color = 'darkred'; break;
+        default: status.style.color = 'black';
+      }
+      // Desaparece automáticamente después de 5 segundos
+      setTimeout(() => { status.textContent = ''; }, 5000);
     }
 
     // 🔹 Función que envía datos al Apps Script
@@ -77,19 +90,18 @@
       const dni = document.getElementById('dni').value.trim();
 
       if (!legajo || !jerarquia || !apellidoNombre || !dni) {
-        status.textContent = '⚠️ Complete todos los campos antes de continuar.';
+        mostrarStatus('⚠️ Complete todos los campos antes de continuar.', 'warning');
         return;
       }
 
-      // Guardar en el navegador
       guardarDatos(legajo, jerarquia, apellidoNombre, dni);
 
-      status.textContent = '📍 Solicitando ubicación...';
+      mostrarStatus('📍 Solicitando ubicación...', 'warning');
       btnInicio.disabled = true;
       btnFin.disabled = true;
 
       if (!navigator.geolocation) {
-        status.textContent = 'Geolocalización no soportada.';
+        mostrarStatus('❌ Geolocalización no soportada.', 'error');
         btnInicio.disabled = false;
         btnFin.disabled = false;
         return;
@@ -109,22 +121,22 @@
           tipo: tipo
         };
 
-        status.textContent = '📤 Enviando...';
+        mostrarStatus('📤 Enviando...', 'warning');
         try {
           const r = await sendToGAS(payload);
           if (r && r.status === 'ok') {
-            status.textContent = `✅ Registro de ${tipo} guardado correctamente.`;
+            mostrarStatus(tipo === 'INICIO' ? '✅ Registro de INICIO guardado correctamente.' : '🛑 Registro de FIN guardado correctamente.', tipo === 'INICIO' ? 'okInicio' : 'okFin');
           } else {
-            status.textContent = '⚠️ Respuesta del servidor: ' + JSON.stringify(r);
+            mostrarStatus('⚠️ Respuesta del servidor: ' + JSON.stringify(r), 'warning');
           }
         } catch (err) {
-          status.textContent = '❌ Error: ' + err.message;
+          mostrarStatus('❌ Error: ' + err.message, 'error');
         } finally {
           btnInicio.disabled = false;
           btnFin.disabled = false;
         }
       }, (err) => {
-        status.textContent = '❌ Error de geolocalización: ' + err.message;
+        mostrarStatus('❌ Error de geolocalización: ' + err.message, 'error');
         btnInicio.disabled = false;
         btnFin.disabled = false;
       }, { enableHighAccuracy:true, timeout:15000, maximumAge:0 });
@@ -136,4 +148,3 @@
   </script>
 </body>
 </html>
-
