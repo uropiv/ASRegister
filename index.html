@@ -6,20 +6,25 @@
   <title>Registro de Asistencia</title>
   <style>
     body{font-family:Arial;margin:2rem;max-width:720px}
-    button{padding:.6rem 1rem;font-size:1rem}
-    #status{margin-top:1rem}
+    button{padding:.6rem 1rem;font-size:1rem;border:none;border-radius:6px;color:white}
+    #btnInicio{background:#28a745} /* Verde */
+    #btnFin{background:#dc3545}   /* Rojo */
+    button:disabled{opacity:0.6;cursor:not-allowed}
+    #status{margin-top:1rem;font-weight:bold}
   </style>
 </head>
 <body>
- <h1>Control de Asistencia</h1>
-  <p>Presiona para enviar tu inicio de servicio/fin de servicio.</p>
+  <h1>Control de Asistencia</h1>
+  <p>Presiona para enviar tu inicio o fin de servicio.</p>
   <button id="btnInicio">Iniciar servicio</button>
   <button id="btnFin">Finalizar servicio</button>
   <p id="status"></p>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbz6HbJERQX9Y7Qa5Z4Ats_uXJ0PTKFGUO5idUft2qbYLTmtmXQ2J40yTKA6_Y0fSHSG/exec"; // <-- poné acá la URL de tu Apps Script
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz6HbJERQX9Y7Qa5Z4Ats_uXJ0PTKFGUO5idUft2qbYLTmtmXQ2J40yTKA6_Y0fSHSG/exec"; 
     const status = document.getElementById('status');
+    const btnInicio = document.getElementById('btnInicio');
+    const btnFin = document.getElementById('btnFin');
 
     // 🔹 Función que envía datos al Apps Script
     async function sendToGAS(payload) {
@@ -34,10 +39,18 @@
     // 🔹 Función para registrar inicio o fin
     async function registrar(tipo) {
       status.textContent = 'Solicitando ubicación...';
+
+      // 🚫 Deshabilitar botones para evitar clics múltiples
+      btnInicio.disabled = true;
+      btnFin.disabled = true;
+
       if (!navigator.geolocation) {
         status.textContent = 'Geolocalización no soportada.';
+        btnInicio.disabled = false;
+        btnFin.disabled = false;
         return;
       }
+
       navigator.geolocation.getCurrentPosition(async (pos) => {
         const payload = {
           lat: pos.coords.latitude,
@@ -51,22 +64,27 @@
         try {
           const r = await sendToGAS(payload);
           if (r && r.status === 'ok') {
-            status.textContent = `Registro de ${tipo} guardado correctamente.`;
+            status.textContent = `✅ Registro de ${tipo} guardado correctamente.`;
           } else {
-            status.textContent = 'Respuesta del servidor: ' + JSON.stringify(r);
+            status.textContent = '⚠️ Respuesta del servidor: ' + JSON.stringify(r);
           }
         } catch (err) {
-          status.textContent = 'Error: ' + err.message;
+          status.textContent = '❌ Error: ' + err.message;
+        } finally {
+          // ✅ Rehabilitar botones siempre al final
+          btnInicio.disabled = false;
+          btnFin.disabled = false;
         }
       }, (err) => {
-        status.textContent = 'Error de geolocalización: ' + err.message;
-      }, { enableHighAccuracy:true });
+        status.textContent = '❌ Error de geolocalización: ' + err.message;
+        btnInicio.disabled = false;
+        btnFin.disabled = false;
+      }, { enableHighAccuracy:true, timeout:15000, maximumAge:0 }); // máxima exactitud GPS
     }
 
     // 🔹 Eventos de los botones
-    document.getElementById('btnInicio').addEventListener('click', () => registrar('INICIO'));
-    document.getElementById('btnFin').addEventListener('click', () => registrar('FIN'));
+    btnInicio.addEventListener('click', () => registrar('INICIO'));
+    btnFin.addEventListener('click', () => registrar('FIN'));
   </script>
 </body>
 </html>
-
