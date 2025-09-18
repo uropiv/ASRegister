@@ -17,7 +17,7 @@
 </head>
 <body>
   <h1>Control de Asistencia</h1>
-  <p>Complete sus datos personales antes de marcar asistencia.</p>
+  <p>Complete sus datos personales (solo la primera vez, luego quedarán guardados en este dispositivo).</p>
 
   <!-- 🔹 Datos del usuario -->
   <label for="legajo">Legajo Personal</label>
@@ -43,6 +43,22 @@
     const btnInicio = document.getElementById('btnInicio');
     const btnFin = document.getElementById('btnFin');
 
+    // 🔹 Cargar datos guardados al abrir la página
+    window.onload = () => {
+      if (localStorage.getItem("legajo")) document.getElementById("legajo").value = localStorage.getItem("legajo");
+      if (localStorage.getItem("jerarquia")) document.getElementById("jerarquia").value = localStorage.getItem("jerarquia");
+      if (localStorage.getItem("apellidoNombre")) document.getElementById("apellidoNombre").value = localStorage.getItem("apellidoNombre");
+      if (localStorage.getItem("dni")) document.getElementById("dni").value = localStorage.getItem("dni");
+    };
+
+    // 🔹 Guardar datos en el navegador
+    function guardarDatos(legajo, jerarquia, apellidoNombre, dni) {
+      localStorage.setItem("legajo", legajo);
+      localStorage.setItem("jerarquia", jerarquia);
+      localStorage.setItem("apellidoNombre", apellidoNombre);
+      localStorage.setItem("dni", dni);
+    }
+
     // 🔹 Función que envía datos al Apps Script
     async function sendToGAS(payload) {
       const res = await fetch(GAS_URL, {
@@ -55,7 +71,6 @@
 
     // 🔹 Función para registrar inicio o fin
     async function registrar(tipo) {
-      // ✅ Validar que los campos no estén vacíos
       const legajo = document.getElementById('legajo').value.trim();
       const jerarquia = document.getElementById('jerarquia').value.trim();
       const apellidoNombre = document.getElementById('apellidoNombre').value.trim();
@@ -66,7 +81,10 @@
         return;
       }
 
-      status.textContent = 'Solicitando ubicación...';
+      // Guardar en el navegador
+      guardarDatos(legajo, jerarquia, apellidoNombre, dni);
+
+      status.textContent = '📍 Solicitando ubicación...';
       btnInicio.disabled = true;
       btnFin.disabled = true;
 
@@ -90,7 +108,8 @@
           userAgent: navigator.userAgent,
           tipo: tipo
         };
-        status.textContent = 'Enviando...';
+
+        status.textContent = '📤 Enviando...';
         try {
           const r = await sendToGAS(payload);
           if (r && r.status === 'ok') {
@@ -117,5 +136,3 @@
   </script>
 </body>
 </html>
-
-
