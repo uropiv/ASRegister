@@ -13,7 +13,9 @@
 <body>
   <h1>Control de Asistencia</h1>
   <p>Presiona para enviar tu registro al ingreso de servicio y finalizaciòn de servicio.</p>
-  <button id="btn">Registrar ahora</button>
+  <button id="btnInicio">Iniciar servicio</button>
+  <button id="btnFin">Finalizar servicio</button>
+
   <div id="status"></div>
 
   <script>
@@ -23,45 +25,40 @@
   const btn = document.getElementById('btn');
   const status = document.getElementById('status');
 
-  async function sendToGAS(payload) {
-    // Usa text/plain para evitar preflight CORS en muchos casos (evita application/json)
-    const res = await fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      body: JSON.stringify(payload)
-    });
-    return res.json();
+ async function registrar(tipo) {
+  status.textContent = 'Solicitando ubicación...';
+  if (!navigator.geolocation) {
+    status.textContent = 'Geolocalización no soportada.';
+    return;
   }
-
-  btn.addEventListener('click', () => {
-    status.textContent = 'Solicitando ubicación...';
-    if (!navigator.geolocation) {
-      status.textContent = 'Geolocalización no soportada.';
-      return;
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const payload = {
+      lat: pos.coords.latitude,
+      lon: pos.coords.longitude,
+      accuracy: pos.coords.accuracy,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      tipo: tipo
+    };
+    status.textContent = 'Enviando...';
+    try {
+      const r = await sendToGAS(payload);
+      if (r && r.status === 'ok') status.textContent = `Registro de ${tipo} guardado correctamente.`;
+      else status.textContent = 'Respuesta: ' + JSON.stringify(r);
+    } catch (err) {
+      status.textContent = 'Error: ' + err.message;
     }
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const payload = {
-        lat: pos.coords.latitude,
-        lon: pos.coords.longitude,
-        accuracy: pos.coords.accuracy,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent
-      };
-      status.textContent = 'Enviando...';
-      try {
-        const r = await sendToGAS(payload);
-        if (r && r.status === 'ok') status.textContent = 'Registro guardado correctamente.';
-        else status.textContent = 'Respuesta del servidor: ' + JSON.stringify(r);
-      } catch (err) {
-        status.textContent = 'Error al enviar: ' + err.message;
-        console.error(err);
-      }
-    }, (err) => {
-      status.textContent = 'Error de geolocalización: ' + err.message;
-    }, { enableHighAccuracy:true, timeout:15000, maximumAge:0 });
-  });
+  }, (err) => {
+    status.textContent = 'Error de geolocalización: ' + err.message;
+  }, { enableHighAccuracy:true });
+}
+
+document.getElementById('btnInicio').addEventListener('click', () => registrar('INICIO'));
+document.getElementById('btnFin').addEventListener('click', () => registrar('FIN'));
+
   </script>
 </body>
 </html>
+
 
 
