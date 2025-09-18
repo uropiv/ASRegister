@@ -6,7 +6,9 @@
   <title>Registro de Asistencia</title>
   <style>
     body{font-family:Arial;margin:2rem;max-width:720px}
-    button{padding:.6rem 1rem;font-size:1rem;border:none;border-radius:6px;color:white}
+    label{display:block;margin-top:1rem;font-weight:bold}
+    input{width:100%;padding:.5rem;margin-top:.3rem;border:1px solid #ccc;border-radius:4px}
+    button{padding:.6rem 1rem;font-size:1rem;border:none;border-radius:6px;color:white;margin-top:1rem}
     #btnInicio{background:#28a745} /* Verde */
     #btnFin{background:#dc3545}   /* Rojo */
     button:disabled{opacity:0.6;cursor:not-allowed}
@@ -15,7 +17,22 @@
 </head>
 <body>
   <h1>Control de Asistencia</h1>
-  <p>Presiona para enviar tu inicio o fin de servicio.</p>
+  <p>Complete sus datos personales antes de marcar asistencia.</p>
+
+  <!-- 🔹 Datos del usuario -->
+  <label for="legajo">Legajo Personal</label>
+  <input id="legajo" type="text" placeholder="Ej: 12345">
+
+  <label for="jerarquia">Jerarquía</label>
+  <input id="jerarquia" type="text" placeholder="Ej: Cabo, Sargento, etc.">
+
+  <label for="apellidoNombre">Apellido y Nombre</label>
+  <input id="apellidoNombre" type="text" placeholder="Ej: Pérez Juan">
+
+  <label for="dni">Documento Nacional de Identidad (DNI)</label>
+  <input id="dni" type="text" placeholder="Ej: 12345678">
+
+  <!-- 🔹 Botones -->
   <button id="btnInicio">Iniciar servicio</button>
   <button id="btnFin">Finalizar servicio</button>
   <p id="status"></p>
@@ -38,9 +55,18 @@
 
     // 🔹 Función para registrar inicio o fin
     async function registrar(tipo) {
-      status.textContent = 'Solicitando ubicación...';
+      // ✅ Validar que los campos no estén vacíos
+      const legajo = document.getElementById('legajo').value.trim();
+      const jerarquia = document.getElementById('jerarquia').value.trim();
+      const apellidoNombre = document.getElementById('apellidoNombre').value.trim();
+      const dni = document.getElementById('dni').value.trim();
 
-      // 🚫 Deshabilitar botones para evitar clics múltiples
+      if (!legajo || !jerarquia || !apellidoNombre || !dni) {
+        status.textContent = '⚠️ Complete todos los campos antes de continuar.';
+        return;
+      }
+
+      status.textContent = 'Solicitando ubicación...';
       btnInicio.disabled = true;
       btnFin.disabled = true;
 
@@ -53,6 +79,10 @@
 
       navigator.geolocation.getCurrentPosition(async (pos) => {
         const payload = {
+          legajo: legajo,
+          jerarquia: jerarquia,
+          apellidoNombre: apellidoNombre,
+          dni: dni,
           lat: pos.coords.latitude,
           lon: pos.coords.longitude,
           accuracy: pos.coords.accuracy,
@@ -71,7 +101,6 @@
         } catch (err) {
           status.textContent = '❌ Error: ' + err.message;
         } finally {
-          // ✅ Rehabilitar botones siempre al final
           btnInicio.disabled = false;
           btnFin.disabled = false;
         }
@@ -79,7 +108,7 @@
         status.textContent = '❌ Error de geolocalización: ' + err.message;
         btnInicio.disabled = false;
         btnFin.disabled = false;
-      }, { enableHighAccuracy:true, timeout:15000, maximumAge:0 }); // máxima exactitud GPS
+      }, { enableHighAccuracy:true, timeout:15000, maximumAge:0 });
     }
 
     // 🔹 Eventos de los botones
