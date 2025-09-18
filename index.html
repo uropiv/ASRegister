@@ -1,65 +1,64 @@
-﻿<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Registro de Asistencia</title>
-  <style>
-    body{font-family:Arial;margin:2rem;max-width:720px}
-    button{padding:.6rem 1rem;font-size:1rem}
-    #status{margin-top:1rem}
-  </style>
+  <meta charset="UTF-8">
+  <title>Registro de Servicio</title>
 </head>
 <body>
-  <h1>Control de Asistencia</h1>
-  <p>Presiona para enviar tu registro al ingreso de servicio y finalizaciòn de servicio.</p>
+  <h2>Registro de Servicio con Geolocalización</h2>
   <button id="btnInicio">Iniciar servicio</button>
   <button id="btnFin">Finalizar servicio</button>
-
-  <div id="status"></div>
+  <p id="status"></p>
 
   <script>
-  // URL del Web App (Apps Script)
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbz6HbJERQX9Y7Qa5Z4Ats_uXJ0PTKFGUO5idUft2qbYLTmtmXQ2J40yTKA6_Y0fSHSG/exec'; // <- reemplaza
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz6HbJERQX9Y7Qa5Z4Ats_uXJ0PTKFGUO5idUft2qbYLTmtmXQ2J40yTKA6_Y0fSHSG/exec"; // <-- poné acá la URL de tu Apps Script
+    const status = document.getElementById('status');
 
-  const btn = document.getElementById('btn');
-  const status = document.getElementById('status');
-
- async function registrar(tipo) {
-  status.textContent = 'Solicitando ubicación...';
-  if (!navigator.geolocation) {
-    status.textContent = 'Geolocalización no soportada.';
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(async (pos) => {
-    const payload = {
-      lat: pos.coords.latitude,
-      lon: pos.coords.longitude,
-      accuracy: pos.coords.accuracy,
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-      tipo: tipo
-    };
-    status.textContent = 'Enviando...';
-    try {
-      const r = await sendToGAS(payload);
-      if (r && r.status === 'ok') status.textContent = `Registro de ${tipo} guardado correctamente.`;
-      else status.textContent = 'Respuesta: ' + JSON.stringify(r);
-    } catch (err) {
-      status.textContent = 'Error: ' + err.message;
+    // 🔹 Función que envía datos al Apps Script
+    async function sendToGAS(payload) {
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        body: JSON.stringify(payload)
+      });
+      return res.json();
     }
-  }, (err) => {
-    status.textContent = 'Error de geolocalización: ' + err.message;
-  }, { enableHighAccuracy:true });
-}
 
-document.getElementById('btnInicio').addEventListener('click', () => registrar('INICIO'));
-document.getElementById('btnFin').addEventListener('click', () => registrar('FIN'));
+    // 🔹 Función para registrar inicio o fin
+    async function registrar(tipo) {
+      status.textContent = 'Solicitando ubicación...';
+      if (!navigator.geolocation) {
+        status.textContent = 'Geolocalización no soportada.';
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const payload = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          tipo: tipo
+        };
+        status.textContent = 'Enviando...';
+        try {
+          const r = await sendToGAS(payload);
+          if (r && r.status === 'ok') {
+            status.textContent = `Registro de ${tipo} guardado correctamente.`;
+          } else {
+            status.textContent = 'Respuesta del servidor: ' + JSON.stringify(r);
+          }
+        } catch (err) {
+          status.textContent = 'Error: ' + err.message;
+        }
+      }, (err) => {
+        status.textContent = 'Error de geolocalización: ' + err.message;
+      }, { enableHighAccuracy:true });
+    }
 
+    // 🔹 Eventos de los botones
+    document.getElementById('btnInicio').addEventListener('click', () => registrar('INICIO'));
+    document.getElementById('btnFin').addEventListener('click', () => registrar('FIN'));
   </script>
 </body>
 </html>
-
-
-
-
