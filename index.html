@@ -5,31 +5,33 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Registro de Asistencia - Vialidad Nacional</title>
 <style>
-/* 🔹 (se mantiene TODO tu CSS original) */
+  /* 🔹 Mantengo TODO tu diseño original */
+  /* ... tu CSS ... */
 
-/* Estilo para el campo Novedades */
-textarea {
-  width: 100%;
-  min-height: 80px;
-  padding: 0.8rem;
-  border-radius: 15px;
-  background: #003366;
-  color: #cce6ff;
-  font-size: 1rem;
-  margin-bottom: 1.8rem;
-  display: none;
-}
-#labelNovedades { display:none; }
-#btnSinNovedades {
-  display:none;
-  margin-bottom:1.8rem;
-  padding:0.6rem 1rem;
-  border-radius:12px;
-  background:#004080;
-  color:#e0f7ff;
-  font-weight:700;
-  cursor:pointer;
-}
+  /* 🔹 Estilos para novedades */
+  #labelNovedades, #novedades, #btnSinNovedades {
+    display: none;
+    width: 100%;
+  }
+  #novedades {
+    min-height: 80px;
+    padding: 0.8rem;
+    border-radius: 15px;
+    background: #003366;
+    color: #cce6ff;
+    font-size: 1rem;
+    margin: 1rem 0;
+  }
+  #btnSinNovedades {
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    background: #004080;
+    color: #e0f7ff;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    margin-bottom: 1rem;
+  }
 </style>
 </head>
 <body>
@@ -53,7 +55,7 @@ textarea {
     <label for="dni">Documento Nacional de Identidad (DNI)</label>
     <input id="dni" type="text" placeholder="Ej: 12345678" aria-required="true" autocomplete="off">
 
-    <!-- 🔹 Campo Novedades solo visible en FIN -->
+    <!-- 🔹 Campo de novedades solo para FIN -->
     <label for="novedades" id="labelNovedades">Novedades</label>
     <textarea id="novedades" placeholder="Ingrese novedades del relevo..."></textarea>
     <button type="button" id="btnSinNovedades">➖ Sin novedades</button>
@@ -66,22 +68,22 @@ textarea {
     <p id="status" role="alert" aria-live="polite"></p>
   </div>
 
-  <div class="badge" id="badge">✔ Registro enviado</div>
+  <div class="badge" id="badge" aria-live="assertive" aria-atomic="true">✔ Registro enviado</div>
 
   <footer>
     Unidad Regional de Orden Público 4 &mdash; Todos los derechos reservados &copy; 2025
   </footer>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwBFgc2B1fH2PL7p2vG1gcCrUZYlQ_1ZWnm-YpJ-W4F_VJkYpI9AaRCE8KzYWForIqu/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycby7Q1ytYC1HkzQFyPF40a1Xs60KDsa-0H0dRzMs03Iug3Mz0Dg1aTA0F_vHROtgmFFA/exec";
 const status = document.getElementById('status');
 const btnInicio = document.getElementById('btnInicio');
 const btnFin = document.getElementById('btnFin');
 const badge = document.getElementById('badge');
 const logo = document.querySelector('.logo');
 
-const novedadesInput = document.getElementById('novedades');
 const labelNovedades = document.getElementById('labelNovedades');
+const novedadesInput = document.getElementById('novedades');
 const btnSinNovedades = document.getElementById('btnSinNovedades');
 
 window.onload = () => {
@@ -90,24 +92,24 @@ window.onload = () => {
   });
 };
 
-// Mostrar/ocultar campo Novedades
+// Mostrar campo novedades SOLO en FIN
 btnInicio.addEventListener('click',()=>{
-  novedadesInput.style.display='none';
   labelNovedades.style.display='none';
+  novedadesInput.style.display='none';
   btnSinNovedades.style.display='none';
 });
 btnFin.addEventListener('click',()=>{
-  novedadesInput.style.display='block';
   labelNovedades.style.display='block';
+  novedadesInput.style.display='block';
   btnSinNovedades.style.display='inline-block';
 });
 
-// Acción rápida Sin novedades
+// Botón rápido: Sin novedades
 btnSinNovedades.addEventListener('click',()=>{
   novedadesInput.value = "Sin novedades";
 });
 
-// Logo animación
+// Logo con animación accesible
 logo.addEventListener('click', () => {
   logo.classList.add('active');
   setTimeout(() => logo.classList.remove('active'), 600);
@@ -182,7 +184,7 @@ async function registrar(tipo){
       tipo
     };
 
-    // Solo agregar novedades si es FIN
+    // 🔹 Solo en FIN agregamos novedades
     if(tipo==='FIN'){
       payload.novedades = novedadesInput.value.trim() || "Sin novedades";
     }
