@@ -132,30 +132,6 @@
     color: #e0f7ff;
   }
 
-  /* Estilo para el botón de selección rápida "Sin novedades" */
-  .btn-sin-novedades {
-    width: 100%;
-    padding: 0.6rem 1rem;
-    margin-top: 0.5rem;
-    margin-bottom: 1.8rem; /* Ajuste para mayor separación del grupo de botones principales */
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 700;
-    background: linear-gradient(45deg, #00cc99, #009966);
-    color: #e0f7ff;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 0 10px #00cc99;
-    transition: all 0.3s ease;
-  }
-  .btn-sin-novedades:hover {
-    filter: brightness(1.2);
-    box-shadow: 0 0 20px #00cc99;
-    transform: scale(1.02);
-  }
-
   /* Botones con efecto neón policial */
   .btn-group {
     display: flex;
@@ -307,10 +283,6 @@
     <label for="dni">Documento Nacional de Identidad (DNI)</label>
     <input id="dni" type="text" placeholder="Ej: 12345678" aria-required="true" autocomplete="off">
 
-    <label for="novedades">Novedades (solo requerido para finalización del servicio)</label>
-    <input id="novedades" type="text" placeholder="Describa novedades en el relevo o use el botón para 'Sin novedades'" aria-required="false" autocomplete="off">
-    <button type="button" id="btnSinNovedades" class="btn-sin-novedades">Sin novedades</button>
-
     <div class="btn-group">
       <button id="btnInicio" aria-label="Iniciar servicio">Iniciar servicio</button>
       <button id="btnFin" aria-label="Finalizar servicio">Finalizar servicio</button>
@@ -326,7 +298,7 @@
   </footer>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwE-a5MLW04TzW3akwBy7wUMQwPRm7gnI5W19fcix-r5FV-kJ_UbqKSfq_4eP75ssef/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbw_wag_QePCZBVC4bpTd2xtJFGvLaIq8Px532RPy2PJKOJgi1GdcA18lgk9ywoy8qdU/exec";
 const status = document.getElementById('status');
 const btnInicio = document.getElementById('btnInicio');
 const btnFin = document.getElementById('btnFin');
@@ -334,7 +306,7 @@ const badge = document.getElementById('badge');
 const logo = document.querySelector('.logo');
 
 window.onload = () => {
-  ["legajo","jerarquia","apellidoNombre","dni","novedades"].forEach(id => {
+  ["legajo","jerarquia","apellidoNombre","dni"].forEach(id => {
     if (localStorage.getItem(id)) document.getElementById(id).value = localStorage.getItem(id);
   });
 };
@@ -351,17 +323,11 @@ logo.addEventListener('keydown', e => {
   }
 });
 
-// Configuración del botón "Sin novedades"
-document.getElementById('btnSinNovedades').addEventListener('click', () => {
-  document.getElementById('novedades').value = 'Sin novedades';
-});
-
-function guardarDatos(legajo, jerarquia, apellidoNombre, dni, novedades){
+function guardarDatos(legajo, jerarquia, apellidoNombre, dni){
   localStorage.setItem("legajo", legajo);
   localStorage.setItem("jerarquia", jerarquia);
   localStorage.setItem("apellidoNombre", apellidoNombre);
   localStorage.setItem("dni", dni);
-  localStorage.setItem("novedades", novedades);
 }
 
 function mostrarStatus(mensaje,tipo){
@@ -393,20 +359,13 @@ async function registrar(tipo){
   const jerarquia = document.getElementById('jerarquia').value.trim();
   const apellidoNombre = document.getElementById('apellidoNombre').value.trim();
   const dni = document.getElementById('dni').value.trim();
-  const novedades = document.getElementById('novedades').value.trim();
 
   if(!legajo||!jerarquia||!apellidoNombre||!dni){
     mostrarStatus('⚠️ Complete todos los campos.','warning');
     return;
   }
 
-  // Validación adicional solo para finalización
-  if(tipo === 'FIN' && !novedades){
-    mostrarStatus('⚠️ Para finalizar, complete el campo NOVEDADES o seleccione "Sin novedades".','warning');
-    return;
-  }
-
-  guardarDatos(legajo,jerarquia,apellidoNombre,dni,novedades);
+  guardarDatos(legajo,jerarquia,apellidoNombre,dni);
   mostrarStatus('📍 Solicitando ubicación...','warning');
   btnInicio.disabled=true; btnFin.disabled=true;
 
@@ -418,7 +377,7 @@ async function registrar(tipo){
 
   navigator.geolocation.getCurrentPosition(async pos=>{
     const payload={
-      legajo, jerarquia, apellidoNombre, dni, novedades,
+      legajo, jerarquia, apellidoNombre, dni,
       lat: pos.coords.latitude,
       lon: pos.coords.longitude,
       accuracy: pos.coords.accuracy,
@@ -430,4 +389,23 @@ async function registrar(tipo){
     try{
       const r = await sendToGAS(payload);
       if(r && r.status==='ok'){
-        mostrarStatus(tipo==='INICIO'?'✅ Registro
+        mostrarStatus(tipo==='INICIO'?'✅ Registro de INICIO guardado.':'🛑 Registro de FIN guardado.',tipo==='INICIO'?'okInicio':'okFin');
+      }else{
+        mostrarStatus('⚠️ Respuesta del servidor: '+JSON.stringify(r),'warning');
+      }
+    }catch(err){
+      mostrarStatus('❌ Error: '+err.message,'error');
+    }finally{
+      btnInicio.disabled=false; btnFin.disabled=false;
+    }
+  },err=>{
+    mostrarStatus('❌ Error de geolocalización: '+err.message,'error');
+    btnInicio.disabled=false; btnFin.disabled=false;
+  },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+
+btnInicio.addEventListener('click',()=>registrar('INICIO'));
+btnFin.addEventListener('click',()=>registrar('FIN'));
+</script>
+</body>
+</html>
