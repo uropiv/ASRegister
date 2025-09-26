@@ -21,14 +21,16 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 2rem 1rem 5rem; /* espacio abajo para footer */
+    padding: 3.5rem 1.5rem 6rem; /* espacio abajo para footer */
     transition: background 0.5s ease;
   }
 
   /* Contenedor principal */
   .container {
     background: rgba(10, 25, 45, 0.9);
-    padding: 3rem 3.5rem;
+    padding: 3.5rem 3rem;
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
     border-radius: 25px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     width: 100%;
@@ -131,6 +133,17 @@
     outline: none;
     color: #e0f7ff;
   }
+  #novedades {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 15px;
+  background: #003366;
+  color: #cce6ff;
+  font-size: 1rem;
+  resize: none;
+  box-shadow: inset 0 0 12px #001a33;
+}
+
 
   /* Botones con efecto neón policial */
   .btn-group {
@@ -138,7 +151,9 @@
     justify-content: space-between;
     gap: 1.2rem;
     width: 100%;
-  }
+    margin-top: 1.8rem;
+    margin-bottom: 1.2rem;
+      }
   button {
     flex: 1;
     padding: 1rem 0;
@@ -172,16 +187,65 @@
   button#btnFin:hover:not(:disabled) {
     box-shadow: 0 0 35px #ff3300, 0 0 50px #ff6600;
   }
+
+  /* Reutiliza el mismo look del botón FIN para el botón de confirmación */
+button#btnFinConfirm {
+  background: linear-gradient(45deg, #ff3300, #cc0000);
+  box-shadow: 0 0 20px #ff3300, 0 0 40px #cc0000;
+  flex: 1;
+  padding: 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 900;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #e0f7ff;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+
+  margin-top: 2.5rem;   /* separa el botón del textarea */
+  width: 100%;          /* ocupa todo el ancho, igual que los otros botones */
+  display: block;       /* se ve como fila completa */
+    
+}
+button#btnFinConfirm:hover:not(:disabled) {
+  box-shadow: 0 0 35px #ff3300, 0 0 50px #ff6600;
+  transform: scale(1.1);
+}
+button#btnFinConfirm:disabled { opacity:0.45; cursor:not-allowed; box-shadow:none; filter:grayscale(90%); }
+
   button:disabled {
     opacity: 0.45;
     cursor: not-allowed;
     box-shadow: none;
     filter: grayscale(90%);
   }
+  button#btnVolver {
+  background: linear-gradient(45deg, #666666, #333333);
+  box-shadow: 0 0 15px #444444, 0 0 25px #222222;
+  flex:1;
+  padding: 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 900;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #e0e0e0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  transition: all 0.35s ease;
+}
+button#btnVolver:hover { 
+  box-shadow: 0 0 25px #555555, 0 0 40px #333333;
+  transform: scale(1.05);
+}
 
   /* Estado animado con fondo degradado y efecto policial */
   #status {
-    margin-top: 1.8rem;
+    margin-top: 2.2rem;
     font-weight: 800;
     padding: 0.85rem 1.2rem;
     border-radius: 20px;
@@ -236,7 +300,7 @@
     text-align: center;
     font-weight: 700;
     font-size: 1rem;
-    padding: 0.9rem 1rem;
+    padding: 1.2rem 1.5rem;
     letter-spacing: 1.5px;
     box-shadow: 0 -4px 15px rgba(0, 102, 204, 0.8);
     user-select: none;
@@ -244,24 +308,154 @@
     text-transform: uppercase;
   }
 
-  /* Responsive */
-  @media (max-width: 520px) {
-    .container {
-      padding: 2.5rem 2rem;
-    }
-    button {
-      font-size: 1.1rem;
-      padding: 0.85rem 0;
-    }
-    .logo {
-      width: 110px;
-      height: 110px;
-      margin-bottom: 1.5rem;
-    }
+  /* Fondo animado de partículas neón policial */
+.bg-anim-police {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bg-anim-police span {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.45;
+  animation: police-pulse 7s infinite alternate;
+  filter: blur(2px);
+}
+.bg-anim-police span:nth-child(1) {
+  width: 180px; height: 180px;
+  left: 8%; top: 12%;
+  background: radial-gradient(circle, #00aaff 60%, transparent 100%);
+  animation-delay: 0s;
+}
+.bg-anim-police span:nth-child(2) {
+  width: 120px; height: 120px;
+  left: 70%; top: 18%;
+  background: radial-gradient(circle, #ff3300 60%, transparent 100%);
+  animation-delay: 2s;
+}
+.bg-anim-police span:nth-child(3) {
+  width: 90px; height: 90px;
+  left: 40%; top: 70%;
+  background: radial-gradient(circle, #00ff99 60%, transparent 100%);
+  animation-delay: 1s;
+}
+.bg-anim-police span:nth-child(4) {
+  width: 140px; height: 140px;
+  left: 80%; top: 80%;
+  background: radial-gradient(circle, #0040ff 60%, transparent 100%);
+  animation-delay: 3s;
+}
+.bg-anim-police span:nth-child(5) {
+  width: 100px; height: 100px;
+  left: 20%; top: 80%;
+  background: radial-gradient(circle, #ffcc00 60%, transparent 100%);
+  animation-delay: 4s;
+}
+@keyframes police-pulse {
+  0% { transform: scale(1) translateY(0); opacity: 0.45; }
+  50% { transform: scale(1.2) translateY(-20px); opacity: 0.7; }
+  100% { transform: scale(1.05) translateY(10px); opacity: 0.45; }
+}
+
+/* Espacios cómodos y no extremos */
+body {
+  padding: 3.5rem 1.5rem 6rem;
+}
+.container {
+  padding: 3.5rem 3rem;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+.btn-group {
+  margin-top: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+#status {
+  margin-top: 2.2rem;
+}
+footer {
+  padding: 1.2rem 1.5rem;
+}
+@media (max-width: 520px) {
+  .container {
+    padding: 2.2rem 1rem;
+    margin-top: 1.2rem;
+    margin-bottom: 1.2rem;
   }
+  body {
+    padding: 2rem 0.5rem 4rem;
+  }
+}
+#novedadesSection .btn-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.2rem;
+  width: 100%;
+  margin-top: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+button#btnVolver, button#btnFinConfirm {
+  flex: 1;
+  padding: 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 900;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #e0f7ff; 
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  box-shadow: 0 0 15px #001a33;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  width: auto;
+  margin-top: 0;
+  display: inline-block;
+}
+button#btnVolver {
+  background: linear-gradient(45deg, #0066cc, #004080); /* azul neón */
+  box-shadow: 0 0 20px #00aaff, 0 0 40px #004080;       /* sombras como los demás */
+  flex: 1;
+  padding: 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 900;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  color: #e0f7ff; 
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+button#btnVolver:hover:not(:disabled) { 
+  box-shadow: 0 0 35px #00ccff, 0 0 50px #0077cc;
+  transform: scale(1.1);
+}
+
+button#btnFinConfirm {
+  background: linear-gradient(45deg, #ff3300, #cc0000);
+  box-shadow: 0 0 20px #ff3300, 0 0 40px #cc0000;
+}
+button#btnFinConfirm:hover:not(:disabled) {
+  box-shadow: 0 0 35px #ff3300, 0 0 50px #ff6600;
+  transform: scale(1.1);
+}
+button#btnFinConfirm:disabled { opacity:0.45; cursor:not-allowed; box-shadow:none; filter:grayscale(90%); }
 </style>
 </head>
 <body>
+  <!-- Fondo animado llamativo -->
+<div class="bg-anim-police" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
   <div class="container" role="main" aria-label="Formulario de control de asistencia">
     <div class="logo" tabindex="0" aria-label="Logo de la Unidad Regional de Orden Público 4">
       <img src="LogoOP.png" alt="Logo Unidad Regional de Orden Público 4">
@@ -283,6 +477,17 @@
     <label for="dni">Documento Nacional de Identidad (DNI)</label>
     <input id="dni" type="text" placeholder="Ej: 12345678" aria-required="true" autocomplete="off">
 
+    <!-- INICIO: sección de Novedades (oculta al principio) -->
+<div id="novedadesSection" style="display:none; margin-top:0.1rem; width:100%;">
+  <label for="novedades">Novedades</label>
+  <textarea id="novedades" rows="4" placeholder="Describa novedades..."></textarea>
+  <div class="btn-group">
+    <button id="btnVolver" type="button">Volver</button>
+    <button id="btnFinConfirm">Finalizar servicio</button>
+  </div>
+</div>
+<!-- FIN: sección de Novedades -->
+
     <div class="btn-group">
       <button id="btnInicio" aria-label="Iniciar servicio">Iniciar servicio</button>
       <button id="btnFin" aria-label="Finalizar servicio">Finalizar servicio</button>
@@ -298,12 +503,20 @@
   </footer>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbw_wag_QePCZBVC4bpTd2xtJFGvLaIq8Px532RPy2PJKOJgi1GdcA18lgk9ywoy8qdU/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzquhV-s_YMIWs_T53JjeLeyXHx0mTm0VezEefPdiCCapycWNcAx10A0SLJlZYs8mxl/exec";
 const status = document.getElementById('status');
 const btnInicio = document.getElementById('btnInicio');
 const btnFin = document.getElementById('btnFin');
 const badge = document.getElementById('badge');
 const logo = document.querySelector('.logo');
+// Referencias para la sección de Novedades
+const novedadesSection = document.getElementById('novedadesSection');
+const novedadesInput = document.getElementById('novedades');
+const btnFinConfirm = document.getElementById('btnFinConfirm');
+const DEFAULT_NOVEDADES = 'Sin novedades';
+const btnVolver = document.getElementById('btnVolver');
+
+
 
 window.onload = () => {
   ["legajo","jerarquia","apellidoNombre","dni"].forEach(id => {
@@ -354,7 +567,7 @@ async function sendToGAS(payload){
   return res.json();
 }
 
-async function registrar(tipo){
+async function registrar(tipo, novedades = ""){
   const legajo = document.getElementById('legajo').value.trim();
   const jerarquia = document.getElementById('jerarquia').value.trim();
   const apellidoNombre = document.getElementById('apellidoNombre').value.trim();
@@ -383,18 +596,26 @@ async function registrar(tipo){
       accuracy: pos.coords.accuracy,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
-      tipo
+      tipo,
+      novedades
     };
     mostrarStatus('📤 Enviando...','warning');
     try{
       const r = await sendToGAS(payload);
       if(r && r.status==='ok'){
         mostrarStatus(tipo==='INICIO'?'✅ Registro de INICIO guardado.':'🛑 Registro de FIN guardado.',tipo==='INICIO'?'okInicio':'okFin');
+        if(tipo === 'FIN'){
+        // ocultar sección de novedades y restaurar sugerencia
+        novedadesSection.style.display = 'none';
+        novedadesInput.value = DEFAULT_NOVEDADES;
+        }
+
       }else{
         mostrarStatus('⚠️ Respuesta del servidor: '+JSON.stringify(r),'warning');
       }
     }catch(err){
       mostrarStatus('❌ Error: '+err.message,'error');
+
     }finally{
       btnInicio.disabled=false; btnFin.disabled=false;
     }
@@ -405,7 +626,46 @@ async function registrar(tipo){
 }
 
 btnInicio.addEventListener('click',()=>registrar('INICIO'));
-btnFin.addEventListener('click',()=>registrar('FIN'));
+// Al presionar el botón FIN mostramos el formulario de novedades (no enviamos aún)
+btnFin.addEventListener('click', () => {
+  // mostrar la sección de novedades
+  novedadesSection.style.display = 'block';
+  // sugerencia por defecto
+  novedadesInput.value = DEFAULT_NOVEDADES;
+  // focus para escribir rápidamente
+  novedadesInput.focus();
+  // desactivar botones para evitar doble acciones mientras se completa novedades
+  btnInicio.disabled = true;
+  btnFin.disabled = true;
+});
+
+// Cuando confirman fin: validar textarea y llamar a registrar('FIN', novedades)
+btnFinConfirm.addEventListener('click', () => {
+  const nov = novedadesInput.value.trim();
+  if (!nov) {
+    mostrarStatus('⚠️ Debe escribir novedades.','warning');
+    return;
+  }
+  // llamar a registrar enviando las novedades
+  registrar('FIN', nov);
+});
+
+btnVolver.addEventListener('click', () => {
+  // 1️⃣ Ocultar la sección de novedades
+  novedadesSection.style.display = 'none';
+
+  // 2️⃣ Restaurar el valor por defecto del textarea
+  novedadesInput.value = DEFAULT_NOVEDADES;
+
+  // 3️⃣ Volver a habilitar los botones principales
+  btnInicio.disabled = false;
+  btnFin.disabled = false;
+
+  // 4️⃣ (Opcional) Mostrar un mensaje de cancelación
+  mostrarStatus('❌ Acción cancelada.', 'warning');
+});
+
+
 </script>
 </body>
 </html>
