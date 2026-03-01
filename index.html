@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registro de Asistencia - Vialidad Nacional</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="css/styles-v2.css">
+</head>
+<body>
+  <!-- Fondo animado llamativo -->
+<div class="bg-anim-police" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+  <div class="container" role="main" aria-label="Formulario de control de asistencia">
+    <div class="unit-strip">
+      <span class="unit-pill">U.R.O.P. IV</span>
+      <span class="unit-text">Asistencia Operativa - Vialidad</span>
+    </div>
+    <div class="logo" tabindex="0" aria-label="Logo de la Unidad Regional de Orden Público 4">
+      <img src="assets/LogoOP.png" alt="Logo Unidad Regional de Orden Público 4">
+      <!-- Reemplaza el src con la URL o ruta de tu logo -->
+    </div>
+
+    <h1>Control de Asistencia</h1>
+    <p class="subtitle">Complete sus datos antes de marcar asistencia.</p>
+    <div class="hud-clock" aria-live="polite">
+      <span id="clockDay">--</span>
+      <span id="clockTime">00:00:00</span>
+    </div>
+    <div class="ops-status">
+      <span id="chipGps" class="chip chip-neutral">GPS: pendiente</span>
+      <span id="chipZone" class="chip chip-neutral">Zona: pendiente</span>
+      <span id="chipNet" class="chip chip-neutral">Red: pendiente</span>
+      <span id="chipQueue" class="chip chip-neutral">Cola: 0</span>
+    </div>
+    <div class="panel-block map-panel">
+      <h2 class="section-title">Mapa de referencia</h2>
+      <p class="map-legend">Base operativa y radio tolerable de 2.5 km.</p>
+      <div id="referenceMap" role="img" aria-label="Mapa con ubicación de referencia y radio de tolerancia"></div>
+    </div>
+    <div class="panel-block">
+    <h2 class="section-title">Datos del efectivo</h2>
+    <label for="legajo">Legajo Personal</label>
+    <input id="legajo" type="text" placeholder="Ej: 12345" aria-required="true" autocomplete="off">
+
+    <label for="jerarquia">Jerarquía</label>
+    <select id="jerarquia" aria-required="true">
+      <option value="">Seleccione jerarquía</option>
+      <option>COMISARIO GENERAL</option>
+      <option>COMISARIO MAYOR</option>
+      <option>COMISARIO INSPECTOR</option>
+      <option>COMISARIO</option>
+      <option>SUB COMISARIO</option>
+      <option>OFICIAL PRINCIPAL</option>
+      <option>OFICIAL INSPECTOR</option>
+      <option>OFICIAL SUB INSPECTOR</option>
+      <option>OFICIAL AYUDANTE</option>
+      <option>SUB OFICIAL MAYOR</option>
+      <option>SUB OFICIAL PRINCIPAL</option>
+      <option>SARGENTO AYUDANTE</option>
+      <option>SARGENTO PRIMERO</option>
+      <option>SARGENTO</option>
+      <option>CABO PRIMERO</option>
+      <option>CABO</option>
+      <option>AGENTE</option>
+    </select>
+
+    <label for="apellidoNombre">Apellido y Nombre</label>
+    <input id="apellidoNombre" type="text" placeholder="Ej: Pérez Juan" aria-required="true" autocomplete="off">
+
+    <label for="dni">Documento Nacional de Identidad (DNI)</label>
+    <input id="dni" type="text" placeholder="Ej: 12345678" aria-required="true" autocomplete="off">
+    <label class="remember-wrap" for="rememberData">
+      <input id="rememberData" type="checkbox" checked>
+      Recordar mis datos en este equipo
+    </label>
+    <p id="syncInfo" class="sync-info" aria-live="polite"></p>
+    </div>
+
+    <!-- INICIO: sección de Novedades (oculta al principio) -->
+<div id="novedadesSection">
+  <label for="novedades">Novedades</label>
+  <textarea id="novedades" rows="4" placeholder="Describa novedades..."></textarea>
+  <div class="btn-group">
+    <button id="btnVolver" type="button">Volver</button>
+    <button id="btnFinConfirm">Finalizar servicio</button>
+  </div>
+</div>
+<!-- FIN: sección de Novedades -->
+
+    <div class="panel-block panel-actions">
+    <h2 class="section-title">Marcacion de servicio</h2>
+    <div class="btn-group">
+      <button id="btnInicio" aria-label="Iniciar servicio">Iniciar servicio</button>
+      <button id="btnFin" aria-label="Finalizar servicio">Finalizar servicio</button>
+    </div>
+    </div>
+
+    <p id="status" role="alert" aria-live="polite"></p>
+    <div id="receiptBox" class="receipt-box" style="display:none;">
+      <p id="receiptText" class="receipt-text"></p>
+      <div class="btn-group">
+        <button id="btnDownloadReceipt" type="button">Descargar comprobante</button>
+        <button id="btnCopyReceiptId" type="button">Copiar ID</button>
+      </div>
+    </div>
+    <div class="retry-wrap">
+      <button id="btnRetryGeo" type="button" style="display:none;">Reintentar ubicación</button>
+    </div>
+  </div>
+
+  <div class="badge" id="badge" aria-live="assertive" aria-atomic="true">✔ Registro enviado</div>
+
+  <footer>
+    Unidad Regional de Orden Público 4 &mdash; Todos los derechos reservados &copy; 2026
+  </footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="js/app.js"></script>
+</body>
+</html>
+
