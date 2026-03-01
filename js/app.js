@@ -520,6 +520,7 @@ function initInputFilters() {
   const dni = document.getElementById("dni");
   const jerarquia = document.getElementById("jerarquia");
   const apellidoNombre = document.getElementById("apellidoNombre");
+  const novedades = document.getElementById("novedades");
 
   legajo.addEventListener("input", () => {
     legajo.value = sanitizeDigits(legajo.value, 10);
@@ -531,7 +532,12 @@ function initInputFilters() {
     jerarquia.value = sanitizeText(jerarquia.value, 50);
   });
   apellidoNombre.addEventListener("input", () => {
-    apellidoNombre.value = sanitizeText(apellidoNombre.value, 80);
+    // Permite espacios mientras se escribe y solo limita largo en vivo.
+    apellidoNombre.value = apellidoNombre.value.replace(/[\t\r\n]+/g, " ").slice(0, 80);
+  });
+  novedades.addEventListener("input", () => {
+    // Permite texto natural con espacios, limpiando caracteres de control.
+    novedades.value = novedades.value.replace(/[\t\r]/g, " ").slice(0, 500);
   });
 }
 
